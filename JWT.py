@@ -1,14 +1,11 @@
 import jwt
 import requests
+import json
 import time
 import uuid
 
 # This is setting up the project as a an EPIC backend service.
 # The docs https://fhir.epic.com/Documentation?docId=oauth2&section=BackendOAuth2Guide
-
-# Define the private key
-with open("privatekey.pem", "r") as file:
-    private_key = file.read()
 
 # Define the JWT headers
 headers = {
@@ -33,7 +30,6 @@ claims = {
 signing_key = open("privatekey.pem").read()
 signed_token = jwt.encode(claims, signing_key, algorithm="RS384")
 
-# print("  => signed token:", signed_token)
 
 # Prepare API call payload
 payload = {
@@ -51,6 +47,27 @@ response = requests.post(oauth2TokenUrl, data=payload)
 response.raise_for_status()
 
 # Print response details
-print("  => response status:", response.status_code)
-print("  => response header:", response.headers)
-print("  => response body:", response.text)
+# print("  => response body:", response.text)
+
+# Now interacting w the API
+access_token = json.loads(response.text).get("access_token")
+auth = "Bearer " + access_token
+# Testing Allergy Intolerance
+base_url = "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/DSTU2/"
+spec = "Patient"
+patient_ID = "egqBHVfQlt4Bw3XGXoxVxHg3"
+# patient_ID = "T297OoGZ77MTaMTLPOjxyEwB"
+
+
+url = base_url + spec + "/" + patient_ID
+
+# Temp Auth (docs version)
+# auth = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46b2lkOmZoaXIiLCJjbGllbnRfaWQiOiJkOWYwN2JlNi0yOGNkLTQ2OWEtYjJjMS1jNjU5NWNjODE5MDEiLCJlcGljLmVjaSI6InVybjplcGljOk9wZW4uRXBpYy1jdXJyZW50IiwiZXBpYy5tZXRhZGF0YSI6IkI4UWgxWHRjb19tMFM4QmpXNS1QbWVQZ2piSzJFb3F0QXFCZHpHQlN5WG4talUwVm5ObnZMeWlyTGYydlpPbzlWU2ZmbjktZmhNQmk1UnlpZTk5cnBMaW1aNk40NzVDRmFhRFF5SkU1a3ZVckxYTVVfb3UtVGJCSWZwaFZXVmtGIiwiZXBpYy50b2tlbnR5cGUiOiJhY2Nlc3MiLCJleHAiOjE2ODU0NzQxNzIsImlhdCI6MTY4NTQ3MDU3MiwiaXNzIjoidXJuOm9pZDpmaGlyIiwianRpIjoiYzlkN2Q5MWMtNGE5Zi00NzY1LWEwODktMDNhMmMxNjdkMDhhIiwibmJmIjoxNjg1NDcwNTcyLCJzdWIiOiJldk5wLUtoWXdPT3FBWm4xcFoyZW51QTMifQ.SrQxvbfrbSRvVfG_WTlndwHstZReJynsNyDOEkXJYJ_lud3xgLqP7bLkXdnROIpa1FMRiBXiFEzYv4WfpIg_F3c_5boYSpSvYiEnZPvi4TKMRkI0TkNslgXKM6tFRtiqSV9ddxF2FeVpqLdhdmZX87NankB76wjDChTDXCC078jzK-a9Pun23fABxS-2y6YX_1kVIFHcPsxqMAykPl1xK_cmEMWyZTLjcm7GNa4IcL88nOnHZCE36KyuTs1O-gdLc3LLx0N__cBiSznPeAa8hnYrOPWdudOSzvxDxKUoXOWGo7ZrYT36nFha3hIkyoWNg_m87zV_C4X2nmGNl_LpKg"
+
+
+headers = {
+    "Authorization": auth
+}
+
+response = requests.get(url, headers=headers)
+print(response.text)
