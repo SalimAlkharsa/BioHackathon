@@ -47,7 +47,7 @@ response = requests.post(oauth2TokenUrl, data=payload)
 response.raise_for_status()
 
 # Print response details
-# print("  => response body:", response.text)
+print("  => response body:", response.text)
 
 # Now interacting w the API
 access_token = json.loads(response.text).get("access_token")
@@ -70,4 +70,4 @@ headers = {
 }
 
 response = requests.get(url, headers=headers)
-print(response.text)
+# print(response.text)

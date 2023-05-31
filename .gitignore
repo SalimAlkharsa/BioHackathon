@@ -2,4 +2,4 @@ venv/
 privatekey.pem
 publickey509.pem
 JWT.py  
-.vscode
+.vscode/

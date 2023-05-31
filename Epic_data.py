@@ -23,6 +23,7 @@ class Patient:
         # Get patient data
         self.patientData = self.get_patientData()
         self.allergyIntolerance = self.get_allergyIntolerance()
+        self.condition = self.get_condition()
 
     # Getters
     def get_patientData(self):
@@ -36,6 +37,12 @@ class Patient:
             "Authorization": self.token
         }
         return requests.get(self.base_url + "AllergyIntolerance/" + self.patient_ID, headers=headers)
+
+    def get_condition(self):
+        headers = {
+            "Authorization": self.token
+        }
+        return requests.get(self.base_url + "Condition/" + self.patient_ID, headers=headers)
 
     # Establish a connection to the API
     def generate_signed_token(self):
@@ -65,9 +72,8 @@ class Patient:
 
 
 ### TESTING###
-patID = "T81lum-5p6QvDR7l6hv7lfE52bAbA2ylWBnv9CZEzNb0B"
+patID = "TnHWKG1c3Kc571xwwVjTuGQB"
 pat = Patient(patID)
 # '''
-print(pat.patientData.text)
-print(pat.allergyIntolerance.text)
+print(pat.condition.text)
 # '''
