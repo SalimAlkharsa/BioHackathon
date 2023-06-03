@@ -20,9 +20,7 @@ class Patient:
         self.patientData = self.get_patientData()
         self.allergyIntolerance = self.get_allergyIntolerance()
         self.condition = self.get_condition()
-        self.diagnostics = self.get_Diagnostics()
         self.goal = self.get_Goal()
-        self.medication = self.get_Medication()
         self.medicationOrder = self.get_MedicationOrder()
         self.medicationStatement = self.get_MedicationStatement()
         self.observation = self.get_Observation()
@@ -40,7 +38,7 @@ class Patient:
             "Authorization": self.token
         }
         if resource_name == "Observation":
-            url = self.base_url + resource_name + "?patient=" + self.patient_ID + "&category=social-history&issued={issued}"
+            url = self.base_url + resource_name + "?patient=" + self.patient_ID + "&category=vital-signs&issued={issued}"
         else:
             url = self.base_url + resource_name + "?patient=" + self.patient_ID
         response = requests.get(url, headers=headers)
@@ -86,17 +84,6 @@ class Patient:
                         "Condition/" + rescID, headers=headers).text)
         return info
 
-    def get_Diagnostics(self):
-        headers = {
-            "Authorization": self.token
-        }
-        rescIDs = self.get_resourceID("DiagnosticReport")
-        info = []
-        for rescID in rescIDs:
-            info.append(requests.get(self.base_url +
-                        "DiagnosticReport/" + rescID, headers=headers).text)
-        return info
-
     def get_Goal(self):
         headers = {
             "Authorization": self.token
@@ -106,17 +93,6 @@ class Patient:
         for rescID in rescIDs:
             info.append(requests.get(self.base_url +
                         "Goal/" + rescID, headers=headers).text)
-        return info
-
-    def get_Medication(self):
-        headers = {
-            "Authorization": self.token
-        }
-        rescIDs = self.get_resourceID("Medication")
-        info = []
-        for rescID in rescIDs:
-            info.append(requests.get(self.base_url +
-                        "Medication/" + rescID, headers=headers).text)
         return info
 
     def get_MedicationOrder(self):
@@ -152,18 +128,115 @@ class Patient:
                         "Observation/" + rescID, headers=headers).text)
         return info
 
-    # Get the data in a JSON format
-    def to_text(self):
+
+    # Data formatting
+    def format_patientData(self):
+        # Parse the XML data
+        root = ET.fromstring(self.patientData.text)
+        # Define the namespace
+        namespace = {'fhir': 'http://hl7.org/fhir'}
+        # Extract the values
+        extension = root.find('.//{http://hl7.org/fhir}extension[@url="http://hl7.org/fhir/StructureDefinition/us-core-birth-sex"]')
+        gender_value = extension.find('{http://hl7.org/fhir}valueCodeableConcept/{http://hl7.org/fhir}coding/{http://hl7.org/fhir}code').attrib['value']
+        birth_date_value = root.find('.//fhir:birthDate', namespace).attrib['value']
+
+        return [gender_value, birth_date_value]
+    
+    def format_allergyIntolerance(self):
+        allergies = []
+        for allergy in self.allergyIntolerance:
+            # Parse the XML data
+            root = ET.fromstring(allergy)
+            # Define the namespace
+            namespace = {'fhir': 'http://hl7.org/fhir'}
+            # Extract the value
+            allergy_value = root.find('.//fhir:substance/fhir:coding/fhir:display', namespace).attrib['value']
+            allergies.append(allergy_value)
+        return allergies
+    
+    def format_condition(self):
+        conditions = []
+        for condition in self.condition:
+            # Parse the XML data
+            root = ET.fromstring(condition)
+            # Define the namespace
+            namespace = {'fhir': 'http://hl7.org/fhir'}
+            # Extract the value
+            try:
+                condition_value = root.find('.//fhir:code/fhir:coding/fhir:display', namespace).attrib['value']
+                clinical_status = root.find('.//fhir:clinicalStatus', namespace).attrib['value']
+            except AttributeError:
+                condition_value = "No condition description"
+                clinical_status = "No clinical status"
+            conditions.append({condition_value: clinical_status})
+        return conditions
+    
+    def format_goal(self):
+        goals = []
+        for goal in self.goal:
+            # Parse the XML data
+            root = ET.fromstring(goal)
+            # Define the namespace
+            namespace = {'fhir': 'http://hl7.org/fhir'}
+            # Extract the value
+            try:
+                goal_value = root.find('.//fhir:description', namespace).attrib['value']
+            except AttributeError:
+                goal_value = "No goal description"
+            goals.append(goal_value)
+        return goals
+    
+    def format_medicationStatement(self):
+        medications = []
+        for medication in self.medicationStatement:
+            # Parse the XML data
+            root = ET.fromstring(medication)
+            # Define the namespace
+            namespace = {'fhir': 'http://hl7.org/fhir'}
+            # Extract the value
+            try:
+                medication_value = root.find('.//fhir:medicationCodeableConcept/fhir:coding/fhir:display', namespace).attrib['value']
+                instructions = root.find('.//fhir:dosage/fhir:text', namespace).attrib['value']
+            except AttributeError:
+                medication_value = "No medication description"
+                instructions = "No instructions"
+            medications.append({medication_value: instructions})
+        return medications
+            
+    def format_observation(self):
+        observations = []
+        # This is trickier because there are multiple types of observations
+        return observations
+
+    def build_json(self):
+        patient_json = {
+            "patient_ID": self.patient_ID,
+            "patientData": {
+                "sex": self.format_patientData()[0],
+                "birth_date": self.format_patientData()[1]
+            },
+            "allergyIntolerance": self.format_allergyIntolerance(),
+            "condition": self.format_condition(),
+            "goal": self.format_goal(),
+            "medicationStatement": self.format_medicationStatement(),
+            "observation": self.format_observation()
+        }
+        return patient_json
+    
+    # Get the data in a text format for my own reference!
+    def to_text(self): # Used just for debugging
         patient_text = f"Patient ID: {self.patient_ID}\n"
-        patient_text += f"Patient Data:\n{self.patientData.text}\n"
-        patient_text += f"Allergy Intolerance:\n{self.allergyIntolerance}\n"
-        patient_text += f"Condition:\n{self.condition}\n"
-        patient_text += f"Diagnostics:\n{self.diagnostics}\n"
-        patient_text += f"Goal:\n{self.goal}\n"
-        patient_text += f"Medication:\n{self.medication}\n"
-        patient_text += f"Medication Order:\n{self.medicationOrder}\n"
+
+        #patient_text += f"Patient Data:\n{self.patientData.text}\n"
+        #patient_text += f"Allergy Intolerance:\n{self.allergyIntolerance}\n"
+        #patient_text += f"Condition:\n{self.condition}\n"
+        #patient_text += f"Goal:\n{self.goal}\n"
+        
+        ###patient_text += f"Medication Order:\n{self.medicationOrder}\n"
         patient_text += f"Medication Statement:\n{self.medicationStatement}\n"
+        
         patient_text += f"Observation:\n{self.observation}\n"
+
         return patient_text
 
     # Establish a connection to the API
@@ -195,10 +268,11 @@ class Patient:
 
 
 ### TESTING###
-patID = "erXuFYUfucBZaryVksYEcMg3"
+patID = "eIXesllypH3M9tAA5WdJftQ3"
 patient = Patient(patID)
 # '''
 x = patient.to_text()
-with open('x.txt', 'w') as file:
+with open('x.xml', 'w') as file:
     file.write(x)
 # '''
+print(patient.build_json())
