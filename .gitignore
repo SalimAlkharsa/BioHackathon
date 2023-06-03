@@ -1,5 +1,5 @@
 venv/
 privatekey.pem
 publickey509.pem
-JWT.py  
+JWT.py
 .vscode/
