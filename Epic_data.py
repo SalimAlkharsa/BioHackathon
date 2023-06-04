@@ -3,6 +3,8 @@ import requests
 import json
 import time
 import uuid
+import os
+from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
 
 # Set up a patient object
@@ -267,7 +269,7 @@ class Patient:
             "jti": str(uuid.uuid4()),  # fill with reference id
             "exp": int(now + 4 * 60)  # cannot be more than 5 minutes!
         }
-        signing_key = open("privatekey.pem").read()
+        signing_key = os.getenv("priv")
         signed_token = jwt.encode(claims, signing_key, algorithm="RS384")
         return signed_token.encode("utf-8")
 
