@@ -1,7 +1,7 @@
 import requests
 
 # Set the API endpoint URL
-url = 'https://prescraib.herokuapp.com'
+url = 'http://127.0.0.1:5000/cds'
 
 # Example patient ID
 patient_id = 'eIXesllypH3M9tAA5WdJftQ3'
