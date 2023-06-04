@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PharmaAPI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            margin-bottom: 10px;
+        }
+
+        code {
+            font-family: Consolas, monospace;
+            background-color: #f8f8f8;
+            padding: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>PharmaAPI: Prescription CDS for prescription</h1>
+
+    <h2>What is PharmaAPI?</h2>
+    <p>
+        PharmaAPI adds an extra dimension to CDS systems by processing text notes made by the doctor such as
+        instructions for taking prescriptions.
+    </p>
+
+    <h2>How PharmaAPI Helps</h2>
+    <p>
+        Current prescription CDS systems tend to not factor in doctor notes or other typical language variables relevant
+        to prescriptions, typically requiring a secondary check by a pharmacist.
+    </p>
+
+    <h2>Who could use PharmaAPI</h2>
+    <ul>
+        <li>D2C pharmacies could use something of this concept to verify incoming prescriptions.</li>
+        <li>Hospitals who want to build apps on top of their EHR platforms.</li>
+    </ul>
+
+    <h2>How to Use the API</h2>
+    <p>
+        To use the API, follow these steps:
+    </p>
+    <ol>
+        <li>Send a POST request to <code>/cds</code> endpoint.</li>
+        <li>Include the patient ID in the request body as a JSON payload.</li>
+        <li>Receive the CDS output in the response.</li>
+        <a href="/demo">Click here for the Demo</a>
+    </ol>
+
+    <h2>What Data is Considered in the API?</h2>
+    <ol>
+        <li>Patient data (below) considered is gathered from the base Epic EHR collection.</li>
+            <ol>
+                <li>Sex</li>
+                <li>Birth Date</li>
+                <li>Allergy Intolerances</li>
+                <li>Conditions</li>
+                <li>Patient Goals</li>
+                <li>Medication Statements</li>
+                <li>Medication Orders</li>
+            
+            </ol>
+        <li>Drug label data is currently not considered.</li>
+        <li>Basic Flow: Patient Data is formated in a JSON and then is entered into GPT3 asking for a recomendation coupled with reasoning. </li>
+    </ol>
+
+    <p>
+        <strong>Major Disclaimer:</strong> The results of PharmaAPI are untested and are the results of an unoptimized
+        general language model. Take any output with a grain of salt. This is a project developed during a hackathon.
+    </p>
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PharmaAPI Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        select {
+            width: 300px;
+            height: 30px;
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        button {
+            width: 150px;
+            height: 40px;
+            font-size: 18px;
+            margin-top: 20px;
+            background-color: #ccc;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #999;
+        }
+
+        #result {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        pre {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>PharmaAPI Demo</h1>
+
+    <form id="demo-form">
+        <label for="patient-id">Patient ID:</label>
+        <select id="patient-id" required>
+            <option value="erXuFYUfucBZaryVksYEcMg3">erXuFYUfucBZaryVksYEcMg3</option>
+            <option value="eq081-VQEgP8drUUqCWzHfw3">eq081-VQEgP8drUUqCWzHfw3</option>
+            <option value="egqBHVfQlt4Bw3XGXoxVxHg3">egqBHVfQlt4Bw3XGXoxVxHg3</option>
+        </select>
+        <button type="submit">Run Demo</button>
+    </form>
+
+    <div id="result"></div>
+<h1>Sample Code</h1>
+    <pre>
+        <code>
+import requests
+
+# Set the API endpoint URL
+url = ''https://prescraib.herokuapp.com/cds''
+
+# Example patient ID
+patient_id = 'eIXesllypH3M9tAA5WdJftQ3'
+
+# Create the request payload
+payload = {'patient_id': patient_id}
+
+# Send the POST request to the API endpoint
+response = requests.post(url, json=payload)
+
+# Check the response status code
+if response.status_code == 200:
+    # Parse the JSON response
+    data = response.json()
+    cds_output = data['cds_output']
+    print('CDS Output:', cds_output)
+else:
+    print('Error:', response.status_code)
+        </code>
+    </pre>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#demo-form').submit(function (event) {
+                event.preventDefault();
+
+                var patientId = $('#patient-id').val();
+
+                // Set the API endpoint URL
+                var url = 'https://prescraib.herokuapp.com/cds';
+
+                // Create the request payload
+                var payload = { 'patient_id': patientId };
+
+                // Send the POST request to the API endpoint
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: JSON.stringify(payload),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        var cdsOutput = response['cds_output'];
+                        $('#result').html('<strong>CDS Output:</strong><br>' + cdsOutput);
+                    },
+                    error: function (xhr, textStatus, error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

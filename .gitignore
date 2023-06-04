@@ -2,3 +2,5 @@ venv/
 privatekey.pem
 publickey509.pem
 .env
+x.xml
+server_test.py
