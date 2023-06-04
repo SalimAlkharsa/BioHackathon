@@ -204,9 +204,28 @@ class Patient:
         return medications
             
     def format_observation(self):
-        observations = []
-        # This is trickier because there are multiple types of observations
-        return observations
+        # This function is logically tricky, so I'll implement it later,
+        # for now I'll skip it but its data will probably be helpful.
+        pass
+
+    def format_medicationOrder(self):
+        medications = []
+        for medication in self.medicationOrder:
+            # Parse the XML data
+            root = ET.fromstring(medication)
+            # Define the namespace
+            namespace = {'fhir': 'http://hl7.org/fhir'}
+            # Extract the value
+            try:
+                medication = root.find('.//fhir:medicationReference/fhir:display', namespace).attrib['value']
+                instruction = root.find('.//fhir:dosageInstruction/fhir:text', namespace).attrib['value']
+                duration = root.find('.//fhir:dispenseRequest/fhir:expectedSupplyDuration/fhir:value', namespace).attrib['value']
+            except AttributeError:
+                medication = "No medication prescribed"
+                instruction = "No instructions available"
+                duration = "No duration available"
+            medications.append({medication: [instruction, duration]})
+        return medications
 
     def build_json(self):
         patient_json = {
@@ -219,7 +238,7 @@ class Patient:
             "condition": self.format_condition(),
             "goal": self.format_goal(),
             "medicationStatement": self.format_medicationStatement(),
-            "observation": self.format_observation()
+            "medicationOrder": self.format_medicationOrder(),
         }
         return patient_json
     
@@ -232,10 +251,10 @@ class Patient:
         #patient_text += f"Condition:\n{self.condition}\n"
         #patient_text += f"Goal:\n{self.goal}\n"
         
-        ###patient_text += f"Medication Order:\n{self.medicationOrder}\n"
-        patient_text += f"Medication Statement:\n{self.medicationStatement}\n"
+        patient_text += f"Medication Order:\n{self.medicationOrder}\n"
+        #patient_text += f"Medication Statement:\n{self.medicationStatement}\n"
         
-        patient_text += f"Observation:\n{self.observation}\n"
+        #patient_text += f"Observation:\n{self.observation}\n"
 
         return patient_text
 
