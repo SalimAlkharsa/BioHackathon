@@ -11,14 +11,14 @@ def generate_prompt(patient_id):
     prompt += "Q: Does the medicationOrder have any potential issues, given the patient profile? Answer in a simple yes or no, and provide reasoning.\n\nA:"
     return prompt
 
-def make_api_request(prompt):
+def make_GPT_request(prompt):
     load_dotenv()
     openai.api_key = os.getenv("OPENAI_API_KEY")
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=prompt,
         temperature=0,
-        max_tokens=24, ### 24 testing, usw 200 otherwise
+        max_tokens=10, ### 10 testing, use 200 otherwise
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0
@@ -32,6 +32,6 @@ def print_response(response):
 # Example usage
 id = 'eIXesllypH3M9tAA5WdJftQ3'
 prompt = generate_prompt(id)
-response = make_api_request(prompt)
+response = make_GPT_request(prompt)
 print_response(response)
 '''
