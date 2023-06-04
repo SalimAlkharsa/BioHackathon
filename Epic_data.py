@@ -200,7 +200,7 @@ class Patient:
             except AttributeError:
                 medication_value = "No medication description"
                 instructions = "No instructions"
-            medications.append({medication_value: instructions})
+            medications.append({medication_value: {'instructions': instructions}})
         return medications
             
     def format_observation(self):
@@ -224,12 +224,11 @@ class Patient:
                 medication = "No medication prescribed"
                 instruction = "No instructions available"
                 duration = "No duration available"
-            medications.append({medication: [instruction, duration]})
+            medications.append({medication: [{'instruction': instruction}, {'duration': duration}]})
         return medications
 
     def build_json(self):
         patient_json = {
-            "patient_ID": self.patient_ID,
             "patientData": {
                 "sex": self.format_patientData()[0],
                 "birth_date": self.format_patientData()[1]
@@ -250,8 +249,7 @@ class Patient:
         #patient_text += f"Allergy Intolerance:\n{self.allergyIntolerance}\n"
         #patient_text += f"Condition:\n{self.condition}\n"
         #patient_text += f"Goal:\n{self.goal}\n"
-        
-        patient_text += f"Medication Order:\n{self.medicationOrder}\n"
+        #patient_text += f"Medication Order:\n{self.medicationOrder}\n" ####FLAG
         #patient_text += f"Medication Statement:\n{self.medicationStatement}\n"
         
         #patient_text += f"Observation:\n{self.observation}\n"
@@ -286,12 +284,12 @@ class Patient:
         return access_token
 
 
+'''
 ### TESTING###
 patID = "eIXesllypH3M9tAA5WdJftQ3"
 patient = Patient(patID)
-# '''
 x = patient.to_text()
 with open('x.xml', 'w') as file:
     file.write(x)
-# '''
 print(patient.build_json())
+'''
